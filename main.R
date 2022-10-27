@@ -1,5 +1,4 @@
 
-setwd("~/R/Heatwaves")
 source('./functions/ConfigureEnv.R')
 ConfigureEnv()
 
@@ -78,3 +77,4 @@ plot_cpit_reldiag(obs_dat, ens_raw, pp_mean, pp_sd, clim_mean, clim_sd, t = 20, 
 
 ## reliability diagrams
 plot_reldiag(obs_dat, ens_raw, pp_mean, pp_sd, clim_mean, clim_sd, t = 20, lead = 3)
+

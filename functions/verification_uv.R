@@ -345,53 +345,6 @@ vrcrps_norm <- function(y, mean, sd, t){
   
   return(obj)
 }
-verify_vrcrps <- function(){
-  
-  mean <- runif(1, -5, 5)
-  sd <- runif(1, 1, 3)
-  y <- runif(1, -3, 3)
-  t <- runif(1, -2, 2)
-  
-  y_star <- pmax(y, t)
-  Ft <- pnorm(t, mean = mean, sd = sd)
-  Fys <- pnorm(y_star, mean = mean, sd = sd)
-  F0 <- pnorm(0, mean = mean, sd = sd)
-  Ft_sq2 <- pnorm(t, mean = mean, sd = sd/sqrt(2))
-  dt <- dnorm(t, mean = mean, sd = sd)
-  dys <- dnorm(y_star, mean = mean, sd = sd)
-  d0 <- dnorm(0, mean = mean, sd = sd)
-  
-  o1 <- (y - mean)*(2*Fys - 1 - Ft)
-  o2 <- (sd^2)*(2*dys - dt)
-  obj1 <- o1 + o2
-  
-  obj1_func <- function(x, y, t, mean, sd) abs(x - y)*(x > t)*dnorm(x, mean, sd)
-  print(c(obj1, integrate(obj1_func, lower = -Inf, upper = Inf, y = y, t = t, mean = mean, sd = sd)$val))
-  
-  
-  o3 <- sd*(1 - Ft_sq2)/sqrt(pi)
-  o4 <- (sd^2)*dt*(1 - Ft)
-  obj2 <- o3 - o4
-  
-  
-  obj2_inner_func <- function(x1, mean, sd) x1*dnorm(x1, mean, sd)
-  obj2_inner_int = function(x2, mean, sd){
-    sapply(x2, function(z){integrate(obj2_inner_func, lower = z, upper = Inf, mean = mean, sd = sd)$value*dnorm(z, mean, sd)})}
-  obj2_1 <- integrate(obj2_inner_int, lower = t, upper = Inf, mean = mean, sd = sd)$val
-  
-  obj2_inner_func <- function(x1, mean, sd) dnorm(x1, mean, sd)
-  obj2_inner_int = function(x2, mean, sd){
-    sapply(x2, function(z){integrate(obj2_inner_func, lower = z, upper = Inf, mean = mean, sd = sd)$value*z*dnorm(z, mean, sd)})}
-  obj2_2 <- integrate(obj2_inner_int, lower = t, upper = Inf, mean = mean, sd = sd)$val
-  
-  print(c(obj2, obj2_1 - obj2_2))
-  
-  y <- runif(10000, -3, 3)
-  ens <- t(replicate(length(y), qnorm(seq(0.0001, 0.9999, 0.0001), mean, sd)))
-  vrs_samp <- crps_sample(y*(y > t), ens*(ens > t))
-  vrs <- vrcrps_norm(y, mean, sd, t)
-  print(c(mean(vrs_samp), mean(vrs)))
-}
 
 
 # wrapper to get vrCRPS for the three forecast methods at a given threshold
